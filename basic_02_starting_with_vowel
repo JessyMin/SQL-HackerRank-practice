@@ -16,3 +16,26 @@ FROM STATION
 WHERE CITY REGEXP '[AEIOU]$';
 
 # MySQL은 $가 뒤에 붙음.
+
+
+# 3. 시작과 끝이 모음인 city명 추출
+
+# 틀린 표현
+SELECT DISTINCT(CITY)
+FROM STATION
+WHERE CITY REGEXP '^[AEIOU]$';
+
+# 맞는 표현
+SELECT DISTINCT(CITY)
+FROM STATION
+WHERE CITY REGEXP '^[AEIOU].*[AEIOU]$';
+
+
+ /* 해석
+ ^			// start of string
+ [aeiou]			// a single vowel
+ .			// any characted...
+ *			// ...repeated any number of times
+ [aeiou]			// another vowel
+ $			// end of string
+ */
