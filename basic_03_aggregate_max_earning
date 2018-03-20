@@ -1,0 +1,12 @@
+# 2018.3.20 MySQL
+
+SELECT CONCAT(MAX(A.TOTAL_EARNING), '  ', COUNT(A.NAME))
+FROM (
+    SELECT NAME, (MONTHS * SALARY) AS TOTAL_EARNING
+    FROM EMPLOYEE
+    WHERE (MONTHS * SALARY) = (
+        SELECT MAX(MONTHS * SALARY)
+        FROM EMPLOYEE)
+) AS A;
+
+# SELECT 내에 집계값이 오면 자동으로 GROUP BY를 하는 것이므로, 다른 값도 모두 집계값이어야 한다. 
