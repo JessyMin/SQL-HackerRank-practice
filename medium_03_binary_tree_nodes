@@ -1,0 +1,26 @@
+# 2018.3.20 MySQL
+# 이진트리의 각 노드 타입 분류하기
+
+# Working Solution
+SELECT N, CASE
+    WHEN P IS NULL THEN 'Root'
+    WHEN N NOT IN (SELECT P FROM BST WHERE P is not null) THEN'Leaf'
+    ELSE 'Inner' END AS type
+FROM BST
+ORDER BY N;
+
+
+# Not Working
+SELECT N, CASE
+    WHEN P IS NULL THEN 'Root'
+    WHEN N NOT IN (SELECT P FROM BST) THEN'Leaf'
+    ELSE 'Inner' END AS type
+FROM BST
+ORDER BY N;
+
+/*
+Leaf를 검출하지 못함.
+참고 : "NOT IN (Set containing null) always returns no rows."
+https://stackoverflow.com/questions/14245671/mysql-not-in-from-another-column-in-the-same-table
+https://stackoverflow.com/questions/1001144/mysql-select-x-from-a-where-not-in-select-x-from-b-unexpected-result
+*/
