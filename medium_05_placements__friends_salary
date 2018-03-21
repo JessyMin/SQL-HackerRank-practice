@@ -1,0 +1,16 @@
+# 2018.3.21 MySQL
+
+# 친구 연봉이 본인보다 높은 사람 추출하기
+SELECT s.name
+FROM students as s
+JOIN packages as p
+    ON s.id = p.id
+JOIN (SELECT f.id, f.friend_id, p.salary AS friend_salary
+      FROM friends as f
+      JOIN packages as p
+      ON f.friend_id = p.id) as fp
+    ON s.id = fp.id AND p.salary < fp.friend_salary
+ORDER BY fp.friend_salary;
+
+# JOIN할 때는 모든 컬럼을 먼저 JOIN한 뒤 SELECT한 컬럼을 뿌려줌.
+따라서 ON절에 사용되는 값이 SELECT되지 않아도 무방함.
