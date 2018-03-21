@@ -1,0 +1,16 @@
+# 2018.3.20 MySQL
+
+# 점수에 따라 Grade 부여 및 정렬
+
+SELECT CASE WHEN g.grade >= 8 THEN s.name
+       ELSE NULL END as name
+     , g.grade
+     , s.marks
+FROM students as s
+JOIN grades as g
+	ON s.marks BETWEEN g.min_mark AND g.max_mark
+ORDER BY g.grade DESC, CASE
+            WHEN g.grade <8 THEN s.marks
+            ELSE s.name END;
+
+# ORDER BY 절 내에 CASE 문을 쓰는 경우, DESC는 CASE문 바깥에만 사용 가능.
