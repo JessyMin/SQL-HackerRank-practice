@@ -1,0 +1,22 @@
+# 2018.3.22 MySQL
+
+# 해커들의 challenge별 최고 점수를 합산해 total score를 계산.
+
+
+SELECT h.hacker_id, name, total_score
+FROM (SELECT hacker_id, SUM(score) as total_score
+      FROM (SELECT hacker_id, challenge_id, MAX(score) as score
+	        FROM submissions
+	        GROUP BY hacker_id, challenge_id) as m
+      GROUP BY hacker_id
+      HAVING total_score != 0) as t
+JOIN hackers as h
+    ON h.hacker_id = t.hacker_id
+ORDER BY total_score DESC, hacker_id; 
+
+
+/* Lesson Learned
+컬럼명에 쓰는 alias는 JOIN하는 경우만 SELECT 문과 ON 절에만 써주면 된다.(에러를 피하기 위해서는)
+그러나 다른 곳에도 써주는게 좋은 코딩스타일인지는 알아봐야 겠다.
+위 코드는 최소한으로 사용한 것이다.
+*/
