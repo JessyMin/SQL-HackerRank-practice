@@ -1,0 +1,21 @@
+# 2018.3.23 MySQL
+
+# challenge에서 만점을 받은 횟수가 1회 이상인 hacker만 추출
+# https://www.hackerrank.com/challenges/full-score/problem
+
+SELECT h.hacker_id, h.name
+FROM (SELECT s.hacker_id, COUNT(DISTINCT(s.challenge_id)) as count
+      FROM submissions as s
+      JOIN challenges as c
+        ON c.challenge_id = s.challenge_id
+      JOIN difficulty as d
+        ON d.difficulty_level = c.difficulty_level
+      WHERE d.score = s.score
+      GROUP BY hacker_id
+      HAVING count > 1) as a
+JOIN hackers as h
+    ON h.hacker_id = a.hacker_id
+ORDER BY count DESC, h.hacker_id;
+
+
+# 4개의 테이블을 JOIN하는 문제였음. 좀 더 효율적인 방식이 있는지 고민해볼 필요 있음.
