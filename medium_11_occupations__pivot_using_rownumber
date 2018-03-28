@@ -1,0 +1,55 @@
+# MySQL
+# https://www.hackerrank.com/challenges/occupations/problem
+
+SET @r1=0, @r2=0, @r3=0, @r4=0;
+SELECT MIN(doctor), MIN(professor), MIN(singer), MIN(actor)
+FROM (
+    SELECT CASE WHEN occupation = 'Doctor' THEN (@r1:=@r1+1)
+                WHEN occupation = 'Professor' THEN (@r2:=@r2+1)
+                WHEN occupation = 'Singer' THEN (@r3:=@r3+1)
+                WHEN occupation = 'Actor' THEN (@r4:=@r4+1) END AS rownumber,
+            CASE WHEN occupation = 'Doctor' THEN name END AS doctor,
+            CASE WHEN occupation = 'Professor' THEN name END AS professor,
+            CASE WHEN occupation = 'Singer' THEN name END AS singer,
+            CASE WHEN occupation = 'Actor' THEN name END AS actor
+    FROM occupations
+    ORDER BY name) tmp
+GROUP BY rownumber;
+
+
+
+<나의 접근법>
+rownumber를 매기고 JOIN으로 해보려 했으나 막힘. 컨셉만 파악하려고 discussion에 들어갔다가
+결국 그대로 따라하게 됨. 사람들 댓글을 보니 문제 자체가 어려웠고, 이 사람의 코드가 awesome하다고 칭찬일색.
+
+내가 막현던 이유는 rownumber를 1, 2, 3, 4....이렇게 매기는 방식 때문이었다.
+
+SELECT @n := @n + 1 AS RowNumber, s.singer
+FROM (select @n:=0) init,
+  (SELECT CASE WHEN occupation = 'Singer' THEN name ELSE NULL END AS singer
+   FROM occupations
+   GROUP BY singer IS NULL ASC, singer ASC) as s)
+
+ 이렇게 직업별로 4개를 만들어 JOIN하려고 했으니, 코드만 무식하게 길어질 뿐이었다.
+ 아무리 생각해도 이 접근법은 아닌 것 같아서 Discussion에 들어간 거였다.
+
+
+<YujiShen이라는 사람이 쓴 방법>
+
+ 1. 먼저 전체 테이블을 name으로 정렬하고
+ 2. rownumber를 직업별로 따로 매긴 뒤
+ 3. rownumber로 GROUP BY하면서 NOT NULL인 값을 취하는 것이다. 이때 MIN()이나 MAX()를 사용.
+
+이 사람이 참고했다는 링크를 옮겨놓는다.
+
+<a href="http://stratosprovatopoulos.com/web-development/mysql/pivot-a-table-in-mysql/">
+Pivot a table in MySQL
+</a>
+
+<a href="https://stackoverflow.com/questions/1241178/mysql-rows-to-columns/9668036#9668036">
+MySQL - Rows to columns
+</a>
+
+<a href="https://stackoverflow.com/questions/22782932/mysql-get-first-non-null-value-after-group-by/22783112#22783112">
+MySQL - Get first not null value after group by
+</a>
