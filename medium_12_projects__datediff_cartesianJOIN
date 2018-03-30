@@ -1,0 +1,56 @@
+# 2018.3.26 MySQL
+# https://www.hackerrank.com/challenges/projects/problem
+
+
+/*
+task_id별 start_date와 end_date를 이용해 project의 지속기간과 시작/종료일을
+도출하는 과제이다.
+
+1. 각 project의 start_date와 end_date를 먼저 식별해낸다.
+2. 두 집합을 cartesian JOIN한 뒤, start_date가 end_date보다 앞선 것만 추출한다.
+   이 때, datediff()로 계산한 duration을 이용한다.
+3. 한 개의 start_date에 모든 end_date가 붙어 있으므로, 가장 빠른 값을 취한다(MIN())
+4. duration을 이용해 end_date를 다시 산출, 출력한다.
+
+SELECT start_date, start_date + interval duration day
+FROM(SELECT t1.start_date, MIN(datediff(t2.end_date, t1.start_date)) as duration
+     FROM (SELECT start_date
+           FROM projects
+           WHERE start_date NOT IN (SELECT end_date FROM projects)) t1,
+          (SELECT end_date
+           FROM projects
+           WHERE end_date NOT IN (SELECT start_date FROM projects)) t2
+     WHERE datediff(t2.end_date, t1.start_date) >= 0
+     GROUP BY t1.start_date) t3
+ORDER BY duration, start_date;
+
+
+/* 아래 코드에서 막혀서 고민하다가 Discussion을 참고했다. 다만 이번에는 코드를 보지 않고
+문제를 해결하는 접근 컨셉만 파악하고, 쿼리는 직접 짰다.
+
+내가 막혔던 부분은 아래와 같은 접근법이다.
+셀프조인해서 end_date와 start_date가 같은 row끼리 찾아서 붙여가는 것이다.
+하지만 project 기간의 MAX값을 모르는 상태에서 LEFT JOIN을 언제까지 반복해야 하는지 알 수 없다는 게
+근본적인 문제였다.
+
+
+SELECT t1.start_date, p3.end_date,
+       CASE WHEN p3.end_date IS NULL THEN day
+            ELSE day+1 END AS day2
+FROM (SELECT p1.start_date, p2.end_date,
+             CASE WHEN p2.end_date IS NULL THEN 1
+                  ELSE 2 END AS day
+      FROM projects p1
+      LEFT JOIN projects p2 ON
+           p1.end_date = p2.start_date) as t1
+LEFT JOIN projects p3 ON
+     t1.end_date = p3.start_date
+ORDER BY t1.start_date;
+
+반면 위 해결책의 접근법은 나처럼 하나씩 비교해서 붙여가는 방법과 달리,
+전체를 한눈으로 조망해서 해결하는 것이었다.
+
+Lesson & Learned
+문제를 풀지 못한 이유: Date를 다루는 방법을 다양하게 알지 못했다.
+datediff()를 모르는 상태에서, end_date = start_date + interval 1 day 이런 것만
+활용해서 풀려고 하니 사고가 막혀서 나아가질 못했다.
