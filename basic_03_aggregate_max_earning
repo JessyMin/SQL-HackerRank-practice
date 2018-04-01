@@ -1,12 +1,22 @@
 # 2018.3.20 MySQL
+# https://www.hackerrank.com/challenges/earnings-of-employees/problem
 
-SELECT CONCAT(MAX(A.TOTAL_EARNING), '  ', COUNT(A.NAME))
-FROM (
-    SELECT NAME, (MONTHS * SALARY) AS TOTAL_EARNING
-    FROM EMPLOYEE
-    WHERE (MONTHS * SALARY) = (
-        SELECT MAX(MONTHS * SALARY)
-        FROM EMPLOYEE)
-) AS A;
+# 가장 높은 연봉과 이에 해당되는 직원 수 구하기
 
-# SELECT 내에 집계값이 오면 자동으로 GROUP BY를 하는 것이므로, 다른 값도 모두 집계값이어야 한다. 
+# Ver.2.0
+SELECT CONCAT(MAX(months * salary), ' ', COUNT(name))
+FROM employee
+WHERE (months * salary) = (SELECT MAX(months * salary) FROM employee);
+
+
+# Ver.1.0
+SELECT CONCAT(MAX(a.total_earning), '  ', COUNT(a.name))
+FROM (SELECT name, (months * salary) AS total_earning
+      FROM employee
+      WHERE (months * salary) = (SELECT MAX(months * salary) FROM employee)
+      ) AS a;
+
+/*
+Lesson & Learned
+SELECT 내에 집계값이 오면 자동으로 full-group-by를 하게 되므로, 다른 값도 모두 집계값이어야 함.
+*/
