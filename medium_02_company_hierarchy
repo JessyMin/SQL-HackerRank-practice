@@ -5,17 +5,17 @@
 
 SELECT c.company_code
     , c.founder
-    , num.l_manager
-    , num.s_manager
-    , num.manager
-    , num.employee
+    , e.l_manager
+    , e.s_manager
+    , e.manager
+    , e.employee
 FROM company as c
 JOIN (SELECT company_code
-		, COUNT(DISTINCT(lead_manager_code)) as l_manager
-		, COUNT(DISTINCT(senior_manager_code)) as s_manager
-		, COUNT(DISTINCT(manager_code)) as manager
-		, COUNT(DISTINCT(employee_code)) as employee
-	  FROM employee
-	  GROUP BY company_code) as num
-ON c.company_code = num.company_code
+  		, COUNT(DISTINCT(lead_manager_code)) as l_manager
+  		, COUNT(DISTINCT(senior_manager_code)) as s_manager
+  		, COUNT(DISTINCT(manager_code)) as manager
+  		, COUNT(DISTINCT(employee_code)) as employee
+  	  FROM employee
+  	  GROUP BY company_code) as e
+ON c.company_code = e.company_code
 ORDER BY company_code;

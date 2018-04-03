@@ -1,14 +1,13 @@
 # 2018.3.19 MySQL
 
 # 세 변의 길이로 삼각형 타입 판별하기
-SELECT CASE WHEN (A+B)>C AND (B+C)>A AND (A+C)>B THEN
-    CASE WHEN A=B AND B=C THEN 'Equilateral'
-         WHEN A=B OR B=C OR C=A THEN 'Isosceles'
-         ELSE 'Scalene'
-         END
-    ELSE 'Not A Triangle'
-    END AS TYPE
-FROM TRIANGLES;
+SELECT CASE
+    WHEN (A+B)>C AND (B+C)>A AND (A+C)>B
+      THEN CASE WHEN A=B AND B=C THEN 'Equilateral'
+                WHEN A=B OR B=C OR C=A THEN 'Isosceles'
+                ELSE 'Scalene' END
+    ELSE 'Not A Triangle' END AS type
+FROM triangles;
 
 # 아래 구문은 제대로 작동하지 않음. 해당 값으로 판별하지 못함.
 WHEN A=B=C THEN 'Equilateral'
