@@ -1,7 +1,9 @@
-# 2018.3.20 MySQL
-# https://www.hackerrank.com/challenges/earnings-of-employees/problem
+/*
+2018.3.20 MySQL
+https://www.hackerrank.com/challenges/earnings-of-employees/problem
+가장 높은 연봉과 이에 해당되는 직원 수 구하기
+*/
 
-# 가장 높은 연봉과 이에 해당되는 직원 수 구하기
 
 # Ver.2.0
 SELECT CONCAT(MAX(months * salary), ' ', COUNT(name))
@@ -14,7 +16,7 @@ SELECT CONCAT(MAX(a.total_earning), '  ', COUNT(a.name))
 FROM (SELECT name, (months * salary) AS total_earning
       FROM employee
       WHERE (months * salary) = (SELECT MAX(months * salary) FROM employee)
-      ) AS a;
+      ) a;
 
 /*
 Lesson & Learned
