@@ -13,10 +13,10 @@ FROM (
             SELECT hacker_id, MAX(score) AS c_score
 	          FROM submissions
 	          GROUP BY hacker_id, challenge_id
-            ) AS s  --각 hacker의 challenge별 최대 점수 추출
+            ) s  --각 hacker의 challenge별 최대 점수 추출
       GROUP BY hacker_id
       HAVING total_score != 0  --점수 총합이 0인 사람 제외
-      ) AS t  --hacker별 점수 총합 산출
+      ) t  --hacker별 점수 총합 산출
 JOIN hackers AS h
   ON h.hacker_id = t.hacker_id
 ORDER BY total_score DESC, hacker_id;
@@ -28,7 +28,7 @@ FROM (
       SELECT hacker_id, challenge_id, MAX(score) AS score
 	    FROM submissions
 	    GROUP BY hacker_id, challenge_id
-      ) AS s
+      ) s
 JOIN hackers AS h
   ON h.hacker_id = s.hacker_id
 GROUP BY hacker_id
