@@ -1,14 +1,17 @@
-# The PADS, MySQL
+/*
+MySQL
+The PADS
+https://www.hackerrank.com/challenges/the-pads/problem
+CONCAT을 사용해 출력하기
+*/
 
-# https://www.hackerrank.com/challenges/the-pads/problem
-# CONCAT을 사용해 출력하기
-
-
-SELECT CONCAT(name, CASE
-    WHEN occupation = 'Doctor' THEN '(D)'
-    WHEN occupation = 'Singer' THEN '(S)'
-    WHEN occupation = 'Professor' THEN '(P)'
-    WHEN occupation = 'Actor' THEN '(A)' END)
+SELECT CONCAT(name,
+    CASE
+      WHEN occupation = 'Doctor' THEN '(D)'
+      WHEN occupation = 'Singer' THEN '(S)'
+      WHEN occupation = 'Professor' THEN '(P)'
+      WHEN occupation = 'Actor' THEN '(A)'
+    END)
 FROM occupations
 ORDER BY name;
 
@@ -17,3 +20,8 @@ SELECT CONCAT('There are a total of ', COUNT(DISTINCT(name)), ' ', LOWER(occupat
 FROM occupations
 GROUP BY occupation
 ORDER BY COUNT(DISTINCT(name)), occupation;
+
+
+/* Lesson & Learned
+CONCAT 안에는 alias를 할 수 없다.
+*/
