@@ -1,71 +1,133 @@
-# 2018.3.30 MySQL
-# https://www.hackerrank.com/challenges/interviews/problem
-
-# 5개의 테이블을 JOIN하는 문제
-
 /*
-Ver.1.0
-colleges-challenges-submission_stats와,
-colleges-challenges-view_stats를 각각 JOIN하여 contest_id별로 SUM한 뒤 합침.
-비효율적이지만 일단 문제를 해결하는데 초점을 둠.
+2018.3.30 MySQL
+Interviews
+https://www.hackerrank.com/challenges/interviews/problem
+5개의 테이블을 JOIN하는 문제
 */
 
-SELECT con.contest_id, con.hacker_id, con.name
-        , tmp1.s_sub, tmp1.s_a_sub
-        , tmp2.s_views, tmp2.su_views
-FROM contests con
-JOIN (SELECT col.contest_id
-        , SUM(total_submissions) AS s_sub
-        , SUM(total_accepted_submissions) AS s_a_sub
-        FROM challenges ch
-        JOIN submission_stats s
-          ON ch.challenge_id = s.challenge_id
-        JOIN colleges col
-          ON ch.college_id = col.college_id
-        GROUP BY col.contest_id) tmp1
-  ON con.contest_id = tmp1.contest_id
-JOIN (SELECT col.contest_id
-        , SUM(v.total_views) AS s_views
-        , SUM(v.total_unique_views) AS su_views
-        FROM challenges ch
-        JOIN view_stats v
-            ON ch.challenge_id = v.challenge_id
-        JOIN colleges col
-            ON ch.college_id = col.college_id
-        GROUP BY col.contest_id) tmp2
-  ON con.contest_id = tmp2.contest_id
+
+
+/*
+Ver.3.0
+JOIN 비용을 최소화하는 쪽으로 리팩토링.
+먼저 contest_id별로 집계한 뒤,
+hacker_id와 name을 가져오기 위한 JOIN을 가장 마지막에 수행함. (contest 테이블)
+
+*/
+
+SELECT con.contest_id, con.hacker_id, con.name,
+       tmp.total_sub, tmp.total_a_sub,
+       tmp.total_view, tmp.total_u_view
+FROM (
+      SELECT col.contest_id,
+             SUM(s.t_sub) AS total_sub,
+             SUM(s.t_a_sub) AS total_a_sub,
+             SUM(v.t_view) AS total_view,
+             SUM(v.t_u_view) AS total_u_view
+      FROM challenges ch
+      -- 서브미션 횟수를 챌린지 ID별로 합산
+      LEFT JOIN (
+                 SELECT challenge_id,
+                        SUM(total_submissions) AS t_sub,
+                        SUM(total_accepted_submissions) AS t_a_sub
+                 FROM submission_stats
+                 GROUP BY challenge_id
+                ) s
+          ON ch.challenge_id  = s.challenge_id
+      -- 뷰 횟수를 챌린지 ID별로 합산
+      LEFT JOIN (
+                 SELECT challenge_id,
+                        SUM(total_views) AS t_view,
+                        SUM(total_unique_views) AS t_u_view
+                 FROM view_stats
+                 GROUP BY challenge_id
+                ) v
+        ON ch.challenge_id = v.challenge_id
+      JOIN colleges col
+        ON ch.college_id = col.college_id
+      GROUP BY contest_id -- 컨테스트 ID별로 집계
+     ) tmp
+--각 컨테스트ID별로 해커ID와 이름 매칭
+JOIN contests con
+  ON con.contest_id = tmp.contest_id
 ORDER BY con.contest_id;
+
 
 
 /*
 Ver.2.0
-먼저 submission_stats와 view_stats 각각을 challenge_id별로 GROUP BY한 뒤,
+먼저 submission_stats와 view_stats 각각을 challenge_id별로 집계한 뒤,
 challenges를 중심으로 이들을 LEFT JOIN함.
-테이블이 다음과 같은 상태인 것이 핵심이었음. 처음에는 INNER JOIN하여 자꾸 SUM값이 작게 나옴.
+테이블이 다음과 같은 상태이므로 LEFT JOIN해야 함. 처음에는 INNER JOIN하여 자꾸 SUM값이 작게 나왔음.
 
 COUNT(DISTINCT(challenge_id))의 갯수
 - challenges : 1000개 / submission_stats : 853개 / view_stats : 862개
 */
 
-SELECT con.contest_id, con.hacker_id, con.name
-        , SUM(tmp1.s_sub), SUM(tmp1.s_a_sub)
-        , SUM(tmp2.s_view), SUM(tmp2.s_u_view)
+SELECT con.contest_id, con.hacker_id, con.name,
+       SUM(tmp1.s_sub), SUM(tmp1.s_a_sub),
+       SUM(tmp2.s_view), SUM(tmp2.s_u_view)
 FROM challenges ch
-LEFT JOIN (SELECT challenge_id
-           , SUM(total_submissions) AS s_sub
-           , SUM(total_accepted_submissions) AS s_a_sub
+--서브미션 횟수를 챌린지 ID별로 합산
+LEFT JOIN (
+           SELECT challenge_id,
+                  SUM(total_submissions) AS s_sub,
+                  SUM(total_accepted_submissions) AS s_a_sub
            FROM submission_stats
-           GROUP BY challenge_id) tmp1
+           GROUP BY challenge_id
+           ) tmp1
   ON ch.challenge_id  = tmp1.challenge_id
-LEFT JOIN (SELECT challenge_id
-           , SUM(total_views) AS s_view
-           , SUM(total_unique_views) AS s_u_view
+--뷰 횟수를 챌린지 ID별로 합산
+LEFT JOIN (
+           SELECT challenge_id,
+                  SUM(total_views) AS s_view,
+                  SUM(total_unique_views) AS s_u_view
            FROM view_stats
-           GROUP BY challenge_id) tmp2
+           GROUP BY challenge_id
+           ) tmp2
   ON ch.challenge_id = tmp2.challenge_id
 JOIN colleges col
   ON ch.college_id = col.college_id
 JOIN contests con
   ON col.contest_id = con.contest_id
 GROUP BY con.contest_id, con.hacker_id, con.name
+ORDER BY con.contest_id;
+
+
+
+/*
+Ver.1.0
+colleges - challenges - submission_stats와,
+colleges - challenges - view_stats를 각각 JOIN하여 contest_id별로 SUM한 뒤 merge함.
+비효율적이지만 일단 문제를 해결하는데 초점을 둠.
+*/
+
+SELECT con.contest_id, con.hacker_id, con.name,
+       tmp1.s_sub, tmp1.s_a_sub,
+       tmp2.s_views, tmp2.su_views
+FROM contests con
+JOIN (
+      SELECT col.contest_id,
+             SUM(total_submissions) AS s_sub,
+             SUM(total_accepted_submissions) AS s_a_sub
+        FROM challenges ch
+        JOIN submission_stats s
+          ON ch.challenge_id = s.challenge_id
+        JOIN colleges col
+          ON ch.college_id = col.college_id
+        GROUP BY col.contest_id
+      ) tmp1
+  ON con.contest_id = tmp1.contest_id
+JOIN (
+      SELECT col.contest_id,
+             SUM(v.total_views) AS s_views,
+             SUM(v.total_unique_views) AS su_views
+        FROM challenges ch
+        JOIN view_stats v
+            ON ch.challenge_id = v.challenge_id
+        JOIN colleges col
+            ON ch.college_id = col.college_id
+        GROUP BY col.contest_id
+     ) tmp2
+  ON con.contest_id = tmp2.contest_id
 ORDER BY con.contest_id;
