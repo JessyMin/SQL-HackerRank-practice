@@ -1,13 +1,30 @@
-# MySQL
-
-# 삼각형 출력하기. SQL에서도 loop가 가능하다는 걸 보여주기 위한 예제인 듯.
-# procedure를 생성, call하는 방법도 있으나 해커랭크에서는 아래 방법이 선호됨
-
-SELECT REPEAT('* ', @NUMBER := @NUMBER - 1)
-FROM information_schema.tables, (SELECT @NUMBER:=21) t 
-LIMIT 20
+/*
+MySQL
+삼각형 출력하기. SQL에서도 loop가 가능하다는 걸 보여주기 위한 예제인 듯.
+procedure를 생성, call하는 방법도 있으나 해커랭크 사이트에서 허용하지 않아,
+discussion 게시판에서는 아래 방법이 선호됨
+*/
 
 
-SELECT REPEAT('* ', @NUMBER := @NUMBER + 1)
-FROM information_schema.tables, (SELECT @NUMBER:=0) t
-LIMIT 20
+# 역삼각형
+
+SET @number = 21;
+SELECT REPEAT('* ', @number := @number - 1)
+FROM information_schema.tables
+LIMIT 20;
+
+SELECT REPEAT('* ', @number := @number - 1)
+FROM information_schema.tables, (SELECT @number:=21) t
+LIMIT 20;
+
+
+# 삼각형
+
+SET @number = 0;
+SELECT REPEAT('* ', @number := @number + 1)
+FROM information_schema.tables
+LIMIT 20;
+
+SELECT REPEAT('* ', @number := @number + 1)
+FROM information_schema.tables, (SELECT @number:=0) t
+LIMIT 20;
