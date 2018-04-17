@@ -14,7 +14,7 @@ JOIN 비용을 최소화하는 쪽으로 리팩토링.
 hacker_id와 name을 가져오기 위한 JOIN을 가장 마지막에 수행함. (contest 테이블)
 
 */
-
+```
 SELECT con.contest_id, con.hacker_id, con.name,
        tmp.total_sub, tmp.total_a_sub,
        tmp.total_view, tmp.total_u_view
@@ -51,7 +51,7 @@ FROM (
 JOIN contests con
   ON con.contest_id = tmp.contest_id
 ORDER BY con.contest_id;
-
+```
 
 
 /*
