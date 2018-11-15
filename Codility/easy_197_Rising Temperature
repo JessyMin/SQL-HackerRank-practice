@@ -1,0 +1,29 @@
+어제보다 기온이 높은 날짜의 ID 구하기
+
+### 테이블
++---------+------------------+------------------+
+| Id(INT) | RecordDate(DATE) | Temperature(INT) |
++---------+------------------+------------------+
+|       1 |       2015-01-01 |               10 |
+|       2 |       2015-01-02 |               25 |
+|       3 |       2015-01-03 |               20 |
+|       4 |       2015-01-04 |               30 |
++---------+------------------+------------------+
+
+
+### 코드
+
+SELECT w1.Id
+FROM weather w1
+LEFT JOIN weather w2
+  ON datediff(w1.RecordDate, w2.RecordDate) = 1
+WHERE w1.Temperature > w2.Temperature
+;
+
+
+#### Lesson Learned
+SELECT은 뿌려주는 역할 뿐.
+SELECT 절에 명기하지 않은 column을 WHERE 조건에 사용해도
+쿼리가 작동한다.
+
+datediff( ) 까먹지 말자. 
